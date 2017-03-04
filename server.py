@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 # Copyright 2013 Abram Hindle
+# Copyright 2017 Chenrui Lei
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -79,10 +80,9 @@ def hello():
 @app.route("/entity/<entity>", methods=['POST','PUT'])
 def update(entity):
     '''update the entities via this interface'''
-    data = flask_post_json()
-    myWorld.set(entity, data)
-    Entity = myWorld.get(entity)
-    return flask.jsonify(Entity), 200
+    request_data = flask_post_json()
+    myWorld.set(entity, request_data)
+    return flask.jsonify(request_data), 200
 
 @app.route("/world", methods=['POST','GET'])    
 def world():
@@ -92,8 +92,7 @@ def world():
 @app.route("/entity/<entity>")    
 def get_entity(entity):
     '''This is the GET version of the entity interface, return a representation of the entity'''
-    Entity = myWorld.get(entity)
-    return flask.jsonify(Entity), 200
+    return flask.jsonify(myWorld.get(entity)), 200
 
 @app.route("/clear", methods=['POST','GET'])
 def clear():
@@ -103,3 +102,4 @@ def clear():
 
 if __name__ == "__main__":
     app.run()
+    #app.run(host='172.31.45.74', port=8000)

@@ -23,6 +23,13 @@
     <script src="json2.js"></script>
   </head> 
   <body bgcolor="black" height="100%" width="100%"> 
+      <h1 style="text-align: center; background-color:#444;">
+          <span class="welcome-text">W</span><span class="welcome-text">e</span><span class="welcome-text">l</span><span class="welcome-text">c</span><span class="welcome-text">o</span><span class="welcome-text">m</span><span class="welcome-text">e</span>
+          <span class="welcome-text">t</span><span class="welcome-text">o</span>
+          <span class="welcome-text">t</span><span class="welcome-text">h</span><span class="welcome-text">e</span>
+          <span class="welcome-text">C</span><span class="welcome-text">o</span><span class="welcome-text">l</span><span class="welcome-text">o</span><span class="welcome-text">r</span><span class="welcome-text">f</span><span class="welcome-text">u</span><span class="welcome-text">l</span>
+          <span class="welcome-text">W</span><span class="welcome-text">o</span><span class="welcome-text">r</span><span class="welcome-text">l</span><span class="welcome-text">d</span>
+      </h1>
     <canvas id="c" width="100%" height="100%" style="-webkit-tap-highlight-color: transparent;"></canvas> 
     <script>
 var canvas = document.getElementById('c');
@@ -31,6 +38,10 @@ var context = canvas.getContext("2d");
 var W = canvas.width  = window.innerWidth-6;
 var H = canvas.height = window.innerHeight-50;
 
+var welcomeTexts = document.getElementsByClassName("welcome-text"); 
+for(var i=0; i<welcomeTexts.length; i++) {
+    welcomeTexts[i].style.color = "#" + (Math.floor(Math.random() * 155) + 99).toString(16) + (Math.floor(Math.random() * 155) + 99).toString(16) + (Math.floor(Math.random() * 155) + 99).toString(16);
+};
 
 function sendJSONXMLHTTPRequest(url, objects, callback) {
     var xhr = new XMLHttpRequest();
@@ -71,7 +82,10 @@ function drawCircle(context,entity) {
         fillStyle = entity["colour"];
         strokeStyle = fillStyle;
         arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
-        stroke();                                
+        stroke();
+        if (entity["radius"] != 50){
+            fill();
+        }
     }
 }
 
@@ -138,12 +152,24 @@ function getPosition(e) {
 	}
 }
 
-
+var timeoutID;
+        
 function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just  modified!
-    sendJSONXMLHTTPRequest("/entity/" + entity, data, console.log);
+    //window.clearTimeout(timeoutID);
+    //timeoutID = window.setTimeout(sendRequest, 100);
+    
+    //function sendRequest() {
+        sendJSONXMLHTTPRequest("/entity/" + entity, data, function(entity){
+//            console.log(entity);
+//            console.log(data);
+//            console.log(entity==data);
+        });
+    //}
+    
+    //setTimeout(, 1000);
     //sendJSONXMLHTTPRequest("http://" + host + "/entity/" + entity, data, console.log);
 
 }
@@ -254,15 +280,19 @@ mouse = (function() {
 // Add the application specific mouse listeners!
 //XXX: TODO Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
+    addEntityWithoutName({'x':x,'y':y,'colour':'orange'});
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+    addEntityWithoutName({'x':x,'y':y,'colour':'#9df'});
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'green',
+    var randomColor = '#' + (Math.floor(Math.random() * 16777215)).toString(16);
+    var randomX = Math.floor((Math.random() * 80)) - 40;
+    var randomY = Math.floor((Math.random() * 80)) - 40;
+    //console.log(randomX);
+    addEntityWithoutName({'x':x + randomX,'y':y + randomY,'colour': randomColor,
                           'radius':10});
 });
 
@@ -273,6 +303,7 @@ function update() {
         world = response;
         drawNextFrame();
     });
+    //drawNextFrame();
     drawFrame();
 }
 
